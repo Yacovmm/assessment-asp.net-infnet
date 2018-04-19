@@ -1,0 +1,88 @@
+﻿@model IEnumerable<CrudWebAppli.Models.Pessoa>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+@using (Html.BeginForm(new { @class = "form-inline" }))
+{
+    <input type="text" placeholder="Buscar um pessoa" name="busca" class="form-control" />
+    <input type="submit" class="btn btn-default" value="Buscar" />
+}
+
+<p>
+    @Html.ActionLink("Adicionar Pessoa", "Create")
+</p>
+<table class="table" id="tblPessoas">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(x => x.Nome)
+            </th>
+            <th>
+                @Html.DisplayNameFor(x => x.Sobrenome)
+            </th>
+            <th>
+                @Html.DisplayNameFor(x => x.Dt_nascimento)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nome)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Sobrenome)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Dt_nascimento)
+                </td>
+                <td>
+                    @Html.ActionLink("Editar", "Edit", new { id = item.Id }) |
+                    <button type="button" class="btn btn-link" data-item="@item.Id">Deletar</button>|
+@*                    @Html.ActionLink("Delete", "/Pessoa/Delete/" + item.Id)*@
+@*                    @Html.ActionLink("Details", "/Pessoa/Delete" , new { /* id=item.PrimaryKey */ })*@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".btn-link").click(function () {
+                var id = $(this).attr('data-item');
+                if (confirm("Você tem certeza que gostaria de excluir este registro?")) {
+                    $.ajax({
+                        method: "POST",
+                        url: "/Pessoa/Delete/" + id,
+                        success: function (data) {
+                            $("#tblPessoas tbody > tr").remove();
+                            $.each(data, function (i, pessoa) {
+                                $("#tblPessoas tbody").append(
+                                    "<tr>" +
+                                    "   <td>" + pessoa.Nome + "</td>" +
+                                    "   <td>" + pessoa.Email + "</td>" +
+                                    "   <td>" + pessoa.Cidade + "</td>" +
+                                    "   <td>" +
+                                    "       <a href='/Pessoa/Edit/" + pessoa.Id + "'>Editar</a> |" +
+                                    "       <button type=\"button\" class=\"btn btn-link\" data-item=\"" + pessoa.Id + "\">Deletar</button>" +
+                                    "   </td>" +
+                                    "</tr>"
+                                );
+                            });
+                        },
+                        error: function (data) {
+                            alert("Houve um erro na pesquisa.");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

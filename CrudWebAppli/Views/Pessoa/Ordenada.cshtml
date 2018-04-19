@@ -1,0 +1,112 @@
+﻿@model CrudWebAppli.Models.Pessoa
+
+@{
+    ViewBag.Title = "IndexTwo";
+}
+
+<h2>IndexTwo</h2>
+
+@using CrudWebAppli.Models;
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<div class="row">
+    <div class="col">
+        <h2>Aniversariantes do dia</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Nome
+                    </th>
+                    <th>
+                        Sobrenome
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Pessoa pessoa in ViewBag.AniversariantesDoDia)
+                {
+                    <tr>
+                        <td>@pessoa.Nome</td>
+                        <td>@pessoa.Sobrenome</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="row">
+    <div class="col">
+        <h2>Próximos Aniversários</h2>
+        <table class="table" id="tblPessoas">
+            <thead>
+                <tr>
+                    <th>
+                        Nome
+                    </th>
+                    <th>
+                        Sobrenome
+                    </th>
+                    <th>
+                        Data de aniversário
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Pessoa pessoa in ViewBag.Pessoas)
+                {
+                    <tr>
+                        <td>@pessoa.Nome</td>
+                        <td>@pessoa.Sobrenome</td>
+                        <td>@pessoa.Dt_nascimento.ToShortDateString()</td>
+                        <td>
+                            @Html.ActionLink("Edit", "Edit", new { id = pessoa.Id }) |
+                            <button type="button" class="btn btn-link" data-item="@pessoa.Id">Deletar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $(".btn-link").click(function () {
+                var id = $(this).attr('data-item');
+                if (confirm("Você tem certeza que gostaria de excluir este registro?")) {
+                    $.ajax({
+                        method: "POST",
+                        url: "/Pessoa/Delete/" + id,
+                        success: function (data) {
+                            $("#tblPessoas tbody > tr thead > tr").remove();
+                            $.each(data, function (i, pessoa) {
+                                $("#tblPessoas tbody").append(
+                                    "<tr>" +
+                                    "   <td>" + pessoa.Nome + "</td>" +
+                                    "   <td>" + pessoa.Email + "</td>" +
+                                    "   <td>" +
+                                    "       <a href='/Pessoa/Edit/" + pessoa.Id + "'>Editar</a> |" +
+                                    "       <button type=\"button\" class=\"btn btn-link\" data-item=\"" + pessoa.Id + "\">Deletar</button>" +
+                                    "   </td>" +
+                                    "</tr>"
+                                );
+                            });
+                        },
+                        error: function (data) {
+                            alert("Houve um erro na pesquisa.");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
